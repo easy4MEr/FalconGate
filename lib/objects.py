@@ -126,6 +126,8 @@ class Network:
         self.interface = None
         self.mac = None
         self.ip = None
+        self.public_ip = None
+        self.geoip_data = None
         self.gateway = None
         self.netmask = None
         self.net_cidr = None

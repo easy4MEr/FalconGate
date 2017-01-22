@@ -13,6 +13,7 @@ import os
 import sys
 import gc
 import json
+import requests
 
 
 class CleanOldHomenetObjects(threading.Thread):
@@ -247,6 +248,32 @@ def validate_base64(target_str):
         return True
     else:
         return False
+
+
+def what_is_my_ip():
+    ip_regex = re.compile(r'[0-9]+(?:\.[0-9]+){3}')
+    header = {'User-Agent': 'Mozilla/5.0'}
+    try:
+        response = requests.get('http://checkip.dyndns.org/', headers=header)
+        entries = re.findall(ip_regex, response.content)
+        if len(entries) > 0:
+            return entries[0]
+        else:
+            return None
+    except Exception as e:
+        log.debug(e.__doc__ + " - " + e.message)
+        return None
+
+
+def get_geoip(ip):
+    header = {'User-Agent': 'Mozilla/5.0'}
+    try:
+        response = requests.get('http://freegeoip.net/json/' + ip, headers=header)
+        json_data = response.json()
+        return json_data
+    except Exception:
+        log.debug("An error was detected while connecting to freegeoip.net")
+        return None
 
 
 def lookup(ip):

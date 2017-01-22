@@ -105,36 +105,41 @@ def main():
         threads[key].start()
         log.debug('Started thread ' + key)
 
-    time.sleep(15)
+    time.sleep(20)
 
-    # Store process ID and other parameters for the main thread
-    homenet.pid = os.getpid()
-    homenet.executable = sys.executable
-    homenet.args = sys.argv[:]
+    with lock:
+        # Store process ID and other parameters for the main thread
+        homenet.pid = os.getpid()
+        homenet.executable = sys.executable
+        homenet.args = sys.argv[:]
 
-    # Retrieving network configuration from local eth0 interface and storing in global variables
-    addrs = netifaces.ifaddresses(homenet.interface)
+        # Retrieving network configuration from local eth0 interface and storing in global variables
+        addrs = netifaces.ifaddresses(homenet.interface)
 
-    ipinfo = addrs[socket.AF_INET][0]
+        ipinfo = addrs[socket.AF_INET][0]
 
-    # Get MAC for eth0
-    homenet.mac = addrs[netifaces.AF_LINK][0]['addr']
+        # Get MAC for eth0
+        homenet.mac = addrs[netifaces.AF_LINK][0]['addr']
 
-    # IP address for eth0
-    homenet.ip = ipinfo['addr']
+        # IP address for eth0
+        homenet.ip = ipinfo['addr']
 
-    # Netmask for eth0
-    homenet.netmask = ipinfo['netmask']
+        # Netmask for eth0
+        homenet.netmask = ipinfo['netmask']
 
-    cidr = netaddr.IPNetwork('%s/%s' % (homenet.ip, homenet.netmask))
+        cidr = netaddr.IPNetwork('%s/%s' % (homenet.ip, homenet.netmask))
 
-    # Network CIDR for eth0
-    network = cidr.network
-    homenet.net_cidr = netaddr.IPNetwork('%s/%s' % (network, homenet.netmask))
+        # Network CIDR for eth0
+        network = cidr.network
+        homenet.net_cidr = netaddr.IPNetwork('%s/%s' % (network, homenet.netmask))
 
-    # Get default gateway for eth0
-    gws = netifaces.gateways()
-    homenet.gateway = gws['default'][netifaces.AF_INET][0]
+        # Get default gateway for eth0
+        gws = netifaces.gateways()
+        homenet.gateway = gws['default'][netifaces.AF_INET][0]
+
+        # Get public IP and geoip info for the current network
+        homenet.public_ip = utils.what_is_my_ip()
+        homenet.geoip_data = utils.get_geoip(homenet.public_ip)
 
     log.debug('Starting main loop')
 
@@ -148,6 +153,7 @@ def main():
                         utils.save_pkl_object(homenet, "homenet.pkl")
                     flag = True
                 except Exception as e:
+                    print e
                     log.debug(e.__doc__ + " - " + e.message)
                     time.sleep(2)
 
