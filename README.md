@@ -21,6 +21,7 @@ Currently FalconGate it's able to:
 - Detect and report on internal and outbound port scans
 - Report details of all new devices connected to your network
 - Block ads based on open source lists
+- Monitor a custom list of personal or family accounts used in online services for reports of hacking and alerts if any hit was found  
 
 ## Getting Started
 
@@ -48,6 +49,12 @@ FalconGate has a number of software dependencies:
 - PHP
 
 It depends also on several Python modules (see [requirements.txt](requirements.txt) file for details)
+
+### Other dependencies
+
+The devices's malware detection can be enhanced with the utilization of [VirusTotal's personal free API](https://www.virustotal.com/en/documentation/public-api/)
+
+Currently FalconGate uses [have i been pwned](https://haveibeenpwned.com/API/v2) public API to detect whether credentials and/or other data from personal accounts have been stolen by hackers from third party sites.
 
 ### Installing FalconGate
 
