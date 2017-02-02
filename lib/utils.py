@@ -127,25 +127,29 @@ def create_alert_db():
 def add_alert_to_db(alert):
     global homenet
     global lock
+    lid = None
     con = lite.connect('logs/alerts.sqlite')
     with con:
-        cur = con.cursor()
-        cur.execute('select * from alerts')
-        res = cur.fetchone()
-        if not res:
-            alert[0] = 1
-            lid = 1
-        else:
-            cur.execute('select MAX(id) from alerts')
-            res = cur.fetchone()
-            lid = res[0] + 1
-            alert[0] = lid
-
         try:
-            cur.execute("insert into alerts values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", alert)
-        except lite.IntegrityError:
-            ctime = int(time.time())
-            cur.execute("update alerts set lseen = ? where sip = ? and ind = ?", (ctime, alert[7], alert[8]))
+            cur = con.cursor()
+            cur.execute('select * from alerts')
+            res = cur.fetchone()
+            if not res:
+                alert[0] = 1
+                lid = 1
+            else:
+                cur.execute('select MAX(id) from alerts')
+                res = cur.fetchone()
+                lid = res[0] + 1
+                alert[0] = lid
+
+            try:
+                cur.execute("insert into alerts values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", alert)
+            except lite.IntegrityError:
+                ctime = int(time.time())
+                cur.execute("update alerts set lseen = ? where sip = ? and ind = ?", (ctime, alert[7], alert[8]))
+        except Exception:
+            pass
     con.commit()
     con.close()
     return lid
@@ -265,7 +269,7 @@ def what_is_my_ip():
         return None
 
 
-def get_geoip(ip):
+def get_geoip_freegeoip(ip):
     header = {'User-Agent': 'Mozilla/5.0'}
     try:
         response = requests.get('http://freegeoip.net/json/' + ip, headers=header)

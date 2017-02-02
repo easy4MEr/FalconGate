@@ -139,7 +139,7 @@ def main():
 
         # Get public IP and geoip info for the current network
         homenet.public_ip = utils.what_is_my_ip()
-        homenet.geoip_data = utils.get_geoip(homenet.public_ip)
+        homenet.geoip_data = utils.get_geoip_freegeoip(homenet.public_ip)
 
     log.debug('Starting main loop')
 

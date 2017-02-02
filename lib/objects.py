@@ -77,13 +77,14 @@ class Conn:
         self.dst_port = None
         self.proto = None
         self.service = None
-        self.duration = 0
+        self.durations = []
+        self.intervals = []
         self.client_bytes = 0
         self.server_bytes = 0
         self.client_packets = 0
         self.server_packets = 0
         self.country_code = None
-        self.counter = 0
+        self.counter = 1
 
 
 class PortScan:

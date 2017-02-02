@@ -96,8 +96,8 @@ class DownloadIntel(threading.Thread):
 
         # Adding user blacklisted IP addresses
         homenet.bad_ips['user_blacklist'] = []
-        homenet.bad_ips['user_blacklist'] = homenet.bad_ips['user_blacklist'] + homenet.blacklist
-        self.all_ips = self.all_ips + homenet.blacklist
+        homenet.bad_ips['user_blacklist'] = homenet.bad_ips['user_blacklist'] + homenet.user_blacklist
+        self.all_ips = self.all_ips + homenet.user_blacklist
 
     def retrieve_bad_domains(self):
         # Downloading Intel from open sources

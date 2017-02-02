@@ -3,6 +3,7 @@ from lib.logger import *
 import lib.utils as utils
 import time
 import requests
+import copy
 
 
 class DailyAlerts(threading.Thread):
@@ -110,19 +111,20 @@ class MinuteAlerts(threading.Thread):
             self.ctime = int(time.time())
             try:
                 with lock:
-                    for k in homenet.hosts.keys():
-                        if homenet.hosts[k].mac != homenet.mac:
-                            for k1 in homenet.hosts[k].dns.keys():
-                                if homenet.hosts[k].dns[k1].bad:
-                                    self.create_bad_domain_alert(k, k1)
-                            for k1 in homenet.hosts[k].files.keys():
-                                if homenet.hosts[k].files[k1].vt_positives > 2:
-                                    self.create_bad_file_alert(k, k1)
-
-                            for k1 in homenet.hosts[k].conns.keys():
-                                for threat in homenet.bad_ips.keys():
-                                    if homenet.hosts[k].conns[k1].dst_ip in homenet.bad_ips[threat]:
-                                        self.create_bad_ip_alert(threat, k, k1)
+                    temp = copy.deepcopy(homenet)
+                for k in temp.hosts.keys():
+                    if temp.hosts[k].mac != temp.mac:
+                        for k1 in temp.hosts[k].dns.keys():
+                            if temp.hosts[k].dns[k1].bad:
+                                self.create_bad_domain_alert(k, k1)
+                        for k1 in temp.hosts[k].files.keys():
+                            if temp.hosts[k].files[k1].vt_positives > 2:
+                                self.create_bad_file_alert(k, k1)
+                        for k1 in temp.hosts[k].conns.keys():
+                            for threat in temp.bad_ips.keys():
+                                if temp.hosts[k].conns[k1].dst_ip in temp.bad_ips[threat]:
+                                    self.create_bad_ip_alert(threat, k, k1)
+                del temp
             except Exception as e:
                 log.debug(e.__doc__ + " - " + e.message)
             time.sleep(60)

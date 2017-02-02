@@ -13,6 +13,11 @@ class ReadBroConn(threading.Thread):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.bro_conn_log_path = '/usr/local/bro/logs/current/conn.log'
+        self.common_ports = [7, 20, 21, 22, 23, 25, 43, 53, 67, 68, 69, 79, 80, 81, 88, 110, 119, 123, 135, 137, 138,
+                             139, 143, 161, 162, 389, 443, 445, 465, 500, 514, 563, 587, 636, 989, 990, 993, 995, 1025,
+                             1080, 1194, 1214, 1337, 1433, 1434, 1512, 1725, 2483, 2484, 2745, 3050, 3074, 3124, 3127,
+                             3128, 3306, 3389, 3724, 4333, 4444, 5222, 5223, 5432, 5500, 5554, 5631, 5632, 5800, 6000,
+                             6001, 6346, 6347, 6665, 6666, 6667, 6668, 6669, 8080, 8118, 12345, 27374, 31337]
         self.last_pos = 0
         self.last_file_size = 0
         self.new_lines = []
@@ -29,37 +34,28 @@ class ReadBroConn(threading.Thread):
                         line = line.strip()
                         fields = line.split()
                         try:
-                            cip = fields[2]
-                            cid = fields[2] + fields[4] + fields[5]
-                            cid = cid.strip(".")
-                            with lock:
-                                if cip in homenet.hosts:
-                                    if cid not in homenet.hosts[cip].conns:
-                                        homenet.hosts[cip].conns[cid] = self.map_conn_fields(fields)
-                                    else:
-                                        if (float(fields[0]) - homenet.hosts[cip].conns[cid].ts) >= 3600:
-                                            del homenet.hosts[cip].conns[cid]
+                            if int(fields[5]) in self.common_ports:
+                                cip = fields[2]
+                                cid = fields[2] + fields[4] + fields[5]
+                                cid = cid.strip(".")
+                                with lock:
+                                    if cip in homenet.hosts:
+                                        if cid not in homenet.hosts[cip].conns:
                                             homenet.hosts[cip].conns[cid] = self.map_conn_fields(fields)
                                         else:
-                                            if (homenet.hosts[cip].conns[cid].lseen - homenet.hosts[cip].conns[cid].ts) >= 86400:
+                                            if (float(fields[0]) - homenet.hosts[cip].conns[cid].lseen) >= 86400:
                                                 del homenet.hosts[cip].conns[cid]
                                                 homenet.hosts[cip].conns[cid] = self.map_conn_fields(fields)
                                             else:
                                                 homenet.hosts[cip].conns[cid].lseen = float(fields[0])
                                                 try:
-                                                    homenet.hosts[cip].conns[cid].duration += float(fields[8])
-                                                except ValueError:
-                                                    pass
-                                                try:
+                                                    homenet.hosts[cip].conns[cid].durations.append(float(fields[8]))
                                                     homenet.hosts[cip].conns[cid].client_bytes += int(fields[9])
-                                                except ValueError:
-                                                    pass
-                                                try:
                                                     homenet.hosts[cip].conns[cid].server_bytes += int(fields[10])
+                                                    homenet.hosts[cip].conns[cid].client_packets += int(fields[17])
+                                                    homenet.hosts[cip].conns[cid].server_packets += int(fields[19])
                                                 except ValueError:
                                                     pass
-                                                homenet.hosts[cip].conns[cid].client_packets += int(fields[17])
-                                                homenet.hosts[cip].conns[cid].server_packets += int(fields[19])
                                                 homenet.hosts[cip].conns[cid].counter += 1
                         except Exception as e:
                             log.debug(e.__doc__ + " - " + e.message)
@@ -89,6 +85,7 @@ class ReadBroConn(threading.Thread):
     def map_conn_fields(fields):
         conn = Conn()
         conn.ts = float(fields[0])
+        conn.intervals.append(0)
         conn.lseen = float(fields[0])
         conn.src_ip = fields[2]
         conn.dst_ip = fields[4]
@@ -96,9 +93,9 @@ class ReadBroConn(threading.Thread):
         conn.proto = fields[6]
         conn.service = fields[7]
         try:
-            conn.duration = float(fields[8])
+            conn.durations.append(float(fields[8]))
         except ValueError:
-            conn.duration = 0
+            conn.durations.append(0)
         try:
             conn.client_bytes = int(fields[9])
         except ValueError:
@@ -109,7 +106,6 @@ class ReadBroConn(threading.Thread):
             conn.server_bytes = 0
         conn.client_packets = int(fields[17])
         conn.server_packets = int(fields[19])
-        conn.counter = 1
         return conn
 
 

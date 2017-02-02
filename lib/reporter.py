@@ -29,32 +29,33 @@ class AlertReporter(threading.Thread):
 
     def report_new_alerts(self):
         alerts = utils.get_not_reported_alerts()
-        with lock:
-            for a in alerts:
-                email = {}
+        if alerts:
+            with lock:
+                for a in alerts:
+                    email = {}
 
-                if a[1] == 'data_breach':
-                    t = AccountBreachAlertTemplate(a)
-                    t.create_body()
-                else:
-                    t = HostAlertTemplate(homenet, a)
-                    t.create_body()
-
-                email['subject'] = t.subject
-                email['body'] = t.body
-
-                if (not homenet.mailer_mode) or (homenet.mailer_mode == 'standalone'):
-                    res = self.sendmail_stand(email)
-                    if res:
-                        utils.update_alert_nrep(a[0], a[5] + 1)
+                    if a[1] == 'data_breach':
+                        t = AccountBreachAlertTemplate(a)
+                        t.create_body()
                     else:
-                        pass
-                elif homenet.mailer_mode == 'gmail':
-                    res = self.sendmail_gmail(email, homenet.mailer_address, homenet.mailer_pwd)
-                    if res:
-                        utils.update_alert_nrep(a[0], a[5] + 1)
-                    else:
-                        pass
+                        t = HostAlertTemplate(homenet, a)
+                        t.create_body()
+
+                    email['subject'] = t.subject
+                    email['body'] = t.body
+
+                    if (not homenet.mailer_mode) or (homenet.mailer_mode == 'standalone'):
+                        res = self.sendmail_stand(email)
+                        if res:
+                            utils.update_alert_nrep(a[0], a[5] + 1)
+                        else:
+                            pass
+                    elif homenet.mailer_mode == 'gmail':
+                        res = self.sendmail_gmail(email, homenet.mailer_address, homenet.mailer_pwd)
+                        if res:
+                            utils.update_alert_nrep(a[0], a[5] + 1)
+                        else:
+                            pass
 
     def sendmail_stand(self, report):
         fromaddr = "no-reply@falcongate.local"
