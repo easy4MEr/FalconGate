@@ -7,6 +7,7 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from lib.objects import AccountBreachAlertTemplate
 from lib.objects import HostAlertTemplate
+from lib.objects import DataExfilTemplate
 
 
 class AlertReporter(threading.Thread):
@@ -36,6 +37,9 @@ class AlertReporter(threading.Thread):
 
                     if a[1] == 'data_breach':
                         t = AccountBreachAlertTemplate(a)
+                        t.create_body()
+                    elif a[1] == 'dataexfil':
+                        t = DataExfilTemplate(homenet, a)
                         t.create_body()
                     else:
                         t = HostAlertTemplate(homenet, a)

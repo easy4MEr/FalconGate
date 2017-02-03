@@ -39,7 +39,7 @@ class ReadBroConn(threading.Thread):
                                 cid = fields[2] + fields[4] + fields[5]
                                 cid = cid.strip(".")
                                 with lock:
-                                    if cip in homenet.hosts:
+                                    if (cip in homenet.hosts) and (homenet.ip != fields[4]):
                                         if cid not in homenet.hosts[cip].conns:
                                             homenet.hosts[cip].conns[cid] = self.map_conn_fields(fields)
                                         else:
@@ -50,10 +50,12 @@ class ReadBroConn(threading.Thread):
                                                 homenet.hosts[cip].conns[cid].lseen = float(fields[0])
                                                 try:
                                                     homenet.hosts[cip].conns[cid].durations.append(float(fields[8]))
-                                                    homenet.hosts[cip].conns[cid].client_bytes += int(fields[9])
-                                                    homenet.hosts[cip].conns[cid].server_bytes += int(fields[10])
-                                                    homenet.hosts[cip].conns[cid].client_packets += int(fields[17])
-                                                    homenet.hosts[cip].conns[cid].server_packets += int(fields[19])
+                                                    cb = homenet.hosts[cip].conns[cid].client_bytes
+                                                    cb += int(fields[9])
+                                                    homenet.hosts[cip].conns[cid].client_bytes = cb
+                                                    sb = homenet.hosts[cip].conns[cid].server_bytes
+                                                    sb += int(fields[10])
+                                                    homenet.hosts[cip].conns[cid].server_bytes = sb
                                                 except ValueError:
                                                     pass
                                                 homenet.hosts[cip].conns[cid].counter += 1
@@ -89,6 +91,8 @@ class ReadBroConn(threading.Thread):
         conn.lseen = float(fields[0])
         conn.src_ip = fields[2]
         conn.dst_ip = fields[4]
+        dst_country = utils.get_geoip(fields[4])
+        conn.dst_country_code = dst_country
         conn.dst_port = int(fields[5])
         conn.proto = fields[6]
         conn.service = fields[7]

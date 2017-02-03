@@ -14,6 +14,8 @@ import sys
 import gc
 import json
 import requests
+from geoip import geolite2
+import whois
 
 
 class CleanOldHomenetObjects(threading.Thread):
@@ -264,19 +266,16 @@ def what_is_my_ip():
             return entries[0]
         else:
             return None
-    except Exception as e:
-        log.debug(e.__doc__ + " - " + e.message)
+    except Exception:
+        log.debug('Error while retrieving the network public address from http://checkip.dyndns.org')
         return None
 
 
-def get_geoip_freegeoip(ip):
-    header = {'User-Agent': 'Mozilla/5.0'}
-    try:
-        response = requests.get('http://freegeoip.net/json/' + ip, headers=header)
-        json_data = response.json()
-        return json_data
-    except Exception:
-        log.debug("An error was detected while connecting to freegeoip.net")
+def get_geoip(ip):
+    match = geolite2.lookup(ip)
+    if match:
+        return match.country
+    else:
         return None
 
 
@@ -358,3 +357,15 @@ def save_pkl_object(obj, filename):
 def load_pkl_object(filename):
     obj = pickle.load(open(filename, "rb"))
     return obj
+
+
+def get_whois(target):
+    w = None
+    try:
+        w = whois.whois(target)
+    except Exception:
+        pass
+    if w:
+        return w.text
+    else:
+        return None

@@ -55,6 +55,8 @@ class HourlyAlerts(threading.Thread):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.ctime = None
+        self.high_risk_countries = ['US', 'CN', 'RU', 'PE', 'DE', 'KR', 'PL', 'TH', 'TR', 'GB', 'TW', 'BR', 'RO', 'IN',
+                                    'IT', 'HU', 'LT', 'UA']
 
     def run(self):
         global lock
@@ -65,6 +67,9 @@ class HourlyAlerts(threading.Thread):
             try:
                 with lock:
                     for k in homenet.hosts.keys():
+                        for k1 in homenet.hosts[k].conns.keys():
+                            if (homenet.hosts[k].conns[k1].client_bytes > 10000000) and (homenet.hosts[k].conns[k1].dst_country_code in self.high_risk_countries):
+                                self.create_dataexfil_alert(k, k1)
                         if homenet.hosts[k].mac != homenet.mac:
                             if len(homenet.hosts[k].dga_domains) >= 20:
                                 self.create_dga_alert(k)
@@ -74,7 +79,7 @@ class HourlyAlerts(threading.Thread):
                                 del homenet.hosts[k].spammed_domains[:]
             except Exception as e:
                 log.debug(e.__doc__ + " - " + e.message)
-            time.sleep(3600)
+            time.sleep(60)
 
     def create_dga_alert(self, src):
         description = 'This host has been detected to perform a well-known Malware traffic ' \
@@ -93,6 +98,20 @@ class HourlyAlerts(threading.Thread):
         indicators = '|'.join(homenet.hosts[src].spammed_domains)
         reference = 'https://en.wikipedia.org/wiki/Spamming'
         a = [0, 'spammer', self.ctime, self.ctime, 0, 0, 'Spammer', src, indicators, 0, description, reference]
+        alert_id = utils.add_alert_to_db(a)
+        homenet.hosts[src].alerts.append(alert_id)
+
+    def create_dataexfil_alert(self, src, cid):
+        description = 'An abnormal amount of data was sent from this host to a remote IP address located in a high' \
+                      'risk country for Malware and hacking activities. This could indicate that a hacker has ' \
+                      'successfully compromised this device and is stealing data from it.'
+        indicators = 'Data volume(bytes): ' + str(homenet.hosts[src].conns[cid].client_bytes) + '|' + 'Destination host: ' + \
+                     homenet.hosts[src].conns[cid].dst_ip + '|' + 'Destination port: ' + \
+                     str(homenet.hosts[src].conns[cid].dst_port) + '/' + homenet.hosts[src].conns[cid].proto + '|' + \
+                     'Destination country: ' + homenet.hosts[src].conns[cid].dst_country_code + '|' + \
+                     'Whois details:\r\n' + str(utils.get_whois(homenet.hosts[src].conns[cid].dst_ip))
+        reference = 'https://www.techopedia.com/definition/14682/data-exfiltration'
+        a = [0, 'dataexfil', self.ctime, self.ctime, 0, 0, 'DataExfil', src, indicators, 0, description, reference]
         alert_id = utils.add_alert_to_db(a)
         homenet.hosts[src].alerts.append(alert_id)
 

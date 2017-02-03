@@ -41,6 +41,30 @@ class AccountBreachAlertTemplate:
                     " malicious hackers."
 
 
+class DataExfilTemplate:
+    def __init__(self, homenet, alert):
+        self.homenet = homenet
+        self.alert = alert
+        self.subject = "A " + alert[6] + " alert was reported for host " + alert[7]
+        self.indicators = alert[8].split('|')
+        self.references = alert[11].split('|')
+        self.body = ''
+
+    def create_body(self):
+        self.body = "FalconGate has reported a " + self.alert[6] + " alert for the device below:\r\n\r\n" \
+                    "IP address: " + self.alert[7] + "\r\n" \
+                    "Hostname: " + str(self.homenet.hosts[self.alert[7]].hostname) + "\r\n" \
+                    "MAC address: " + str(self.homenet.hosts[self.alert[7]].mac) + "\r\n" \
+                    "MAC vendor: " + str(self.homenet.hosts[self.alert[7]].vendor) + "\r\n" \
+                    "Operating system family: " + "\r\n".join(self.homenet.hosts[self.alert[7]].os_family) + "\r\n" \
+                    "Device family: " + str("\r\n".join(self.homenet.hosts[self.alert[7]].device_family)) + "\r\n\r\n" \
+                    "Description: " + self.alert[10] + "\r\n\r\n" \
+                    "The following indicators were detected:\r\n" + str("\r\n".join(self.indicators)) + "\r\n\r\n" \
+                    "References:\r\n" + str("\r\n".join(self.references)) + "\r\n\r\n" \
+                    "This is the first time this incident is reported.\r\n" \
+                    "We recommend to investigate this issue asap."
+
+
 class DNSRequest:
     def __init__(self):
         self.ts = None
@@ -74,6 +98,7 @@ class Conn:
         self.lseen = None
         self.src_ip = None
         self.dst_ip = None
+        self.dst_country_code = None
         self.dst_port = None
         self.proto = None
         self.service = None
@@ -81,9 +106,6 @@ class Conn:
         self.intervals = []
         self.client_bytes = 0
         self.server_bytes = 0
-        self.client_packets = 0
-        self.server_packets = 0
-        self.country_code = None
         self.counter = 1
 
 
@@ -128,7 +150,7 @@ class Network:
         self.mac = None
         self.ip = None
         self.public_ip = None
-        self.geoip_data = None
+        self.geoip_country = None
         self.gateway = None
         self.netmask = None
         self.net_cidr = None
