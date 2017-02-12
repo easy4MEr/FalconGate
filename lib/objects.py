@@ -9,17 +9,24 @@ class HostAlertTemplate:
 
     def create_body(self):
         self.body = "FalconGate has reported a " + self.alert[6] + " alert for the device below:\r\n\r\n" \
-                    "IP address: " + self.alert[7] + "\r\n" \
-                    "Hostname: " + str(self.homenet.hosts[self.alert[7]].hostname) + "\r\n" \
-                    "MAC address: " + str(self.homenet.hosts[self.alert[7]].mac) + "\r\n" \
-                    "MAC vendor: " + str(self.homenet.hosts[self.alert[7]].vendor) + "\r\n" \
-                    "Operating system family: " + "\r\n".join(self.homenet.hosts[self.alert[7]].os_family) + "\r\n" \
-                    "Device family: " + str("\r\n".join(self.homenet.hosts[self.alert[7]].device_family)) + "\r\n\r\n" \
-                    "Description: " + self.alert[10] + "\r\n\r\n" \
-                    "The following indicators were detected:\r\n" + str("\r\n".join(self.indicators)) + "\r\n\r\n" \
-                    "References:\r\n" + str("\r\n".join(self.references)) + "\r\n\r\n" \
-                    "This is the first time this incident is reported.\r\n" \
-                    "We recommend to investigate this issue asap."
+                                                                   "IP address: " + self.alert[7] + "\r\n" \
+                                                                                                    "Hostname: " + str(
+            self.homenet.hosts[self.alert[7]].hostname) + "\r\n" \
+                                                          "MAC address: " + str(
+            self.homenet.hosts[self.alert[7]].mac) + "\r\n" \
+                                                     "MAC vendor: " + str(
+            self.homenet.hosts[self.alert[7]].vendor) + "\r\n" \
+                                                        "Operating system family: " + "\r\n".join(
+            self.homenet.hosts[self.alert[7]].os_family) + "\r\n" \
+                                                           "Device family: " + str(
+            "\r\n".join(self.homenet.hosts[self.alert[7]].device_family)) + "\r\n\r\n" \
+                                                                            "Description: " + self.alert[
+                        10] + "\r\n\r\n" \
+                              "The following indicators were detected:\r\n" + str(
+            "\r\n".join(self.indicators)) + "\r\n\r\n" \
+                                            "References:\r\n" + str("\r\n".join(self.references)) + "\r\n\r\n" \
+                                                                                                    "This is the first time this incident is reported.\r\n" \
+                                                                                                    "We recommend to investigate this issue asap."
 
 
 class AccountBreachAlertTemplate:
@@ -32,13 +39,15 @@ class AccountBreachAlertTemplate:
 
     def create_body(self):
         self.body = "FalconGate has reported a " + self.alert[6] + " alert:\r\n\r\n" \
-                    "Account at risk: " + self.alert[7] + "\r\n\r\n" \
-                    "Description: " + self.alert[10] + "\r\n\r\n" \
-                    "The following indicators were detected:\r\n" + str("\r\n".join(self.indicators)) + "\r\n\r\n" \
-                    "References:\r\n" + str("\r\n".join(self.references)) + "\r\n\r\n" \
-                    "This is the first time this incident is reported.\r\n" \
-                    "We recommend to change immediately the password for this account to prevent further misuse by" \
-                    " malicious hackers."
+                                                                   "Account at risk: " + self.alert[7] + "\r\n\r\n" \
+                                                                                                         "Description: " + \
+                    self.alert[10] + "\r\n\r\n" \
+                                     "The following indicators were detected:\r\n" + str(
+            "\r\n".join(self.indicators)) + "\r\n\r\n" \
+                                            "References:\r\n" + str("\r\n".join(self.references)) + "\r\n\r\n" \
+                                                                                                    "This is the first time this incident is reported.\r\n" \
+                                                                                                    "We recommend to change immediately the password for this account to prevent further misuse by" \
+                                                                                                    " malicious hackers."
 
 
 class DataExfilTemplate:
@@ -52,17 +61,24 @@ class DataExfilTemplate:
 
     def create_body(self):
         self.body = "FalconGate has reported a " + self.alert[6] + " alert for the device below:\r\n\r\n" \
-                    "IP address: " + self.alert[7] + "\r\n" \
-                    "Hostname: " + str(self.homenet.hosts[self.alert[7]].hostname) + "\r\n" \
-                    "MAC address: " + str(self.homenet.hosts[self.alert[7]].mac) + "\r\n" \
-                    "MAC vendor: " + str(self.homenet.hosts[self.alert[7]].vendor) + "\r\n" \
-                    "Operating system family: " + "\r\n".join(self.homenet.hosts[self.alert[7]].os_family) + "\r\n" \
-                    "Device family: " + str("\r\n".join(self.homenet.hosts[self.alert[7]].device_family)) + "\r\n\r\n" \
-                    "Description: " + self.alert[10] + "\r\n\r\n" \
-                    "The following indicators were detected:\r\n" + str("\r\n".join(self.indicators)) + "\r\n\r\n" \
-                    "References:\r\n" + str("\r\n".join(self.references)) + "\r\n\r\n" \
-                    "This is the first time this incident is reported.\r\n" \
-                    "We recommend to investigate this issue asap."
+                                                                   "IP address: " + self.alert[7] + "\r\n" \
+                                                                                                    "Hostname: " + str(
+            self.homenet.hosts[self.alert[7]].hostname) + "\r\n" \
+                                                          "MAC address: " + str(
+            self.homenet.hosts[self.alert[7]].mac) + "\r\n" \
+                                                     "MAC vendor: " + str(
+            self.homenet.hosts[self.alert[7]].vendor) + "\r\n" \
+                                                        "Operating system family: " + "\r\n".join(
+            self.homenet.hosts[self.alert[7]].os_family) + "\r\n" \
+                                                           "Device family: " + str(
+            "\r\n".join(self.homenet.hosts[self.alert[7]].device_family)) + "\r\n\r\n" \
+                                                                            "Description: " + self.alert[
+                        10] + "\r\n\r\n" \
+                              "The following indicators were detected:\r\n" + str(
+            "\r\n".join(self.indicators)) + "\r\n\r\n" \
+                                            "References:\r\n" + str("\r\n".join(self.references)) + "\r\n\r\n" \
+                                                                                                    "This is the first time this incident is reported.\r\n" \
+                                                                                                    "We recommend to investigate this issue asap."
 
 
 class DNSRequest:
@@ -137,6 +153,7 @@ class Host:
         self.scans = {}
         self.alerts = []
         self.interesting_urls = []
+        self.uploads_stats = {'hourly_uploads': [], 'mean': 0, 'std': 0, 'anomalies': []}
 
 
 class Network:
@@ -158,18 +175,30 @@ class Network:
         self.bad_domains = {}
         self.user_blacklist = []
         self.user_whitelist = []
-        self.target_mime_types = ["application/x-7z-compressed", "application/x-ace-compressed", "application/x-shockwave-flash",
-                                  "application/pdf", "application/vnd.android.package-archive", "application/octet-stream",
-                                  "application/x-bzip", "application/x-bzip2", "application/x-debian-package", "application/java-archive",
-                                  "	application/javascript", "application/x-msdownload", "application/x-ms-application", "application/vnd.ms-excel",
-                                  "application/vnd.ms-excel.addin.macroenabled.12", "application/vnd.ms-excel.sheet.binary.macroenabled.12",
-                                  "application/vnd.ms-excel.template.macroenabled.12", "application/vnd.ms-excel.sheet.macroenabled.12",
-                                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                  "application/vnd.openxmlformats-officedocument.wordprocessingml.template", "application/vnd.ms-powerpoint.slide.macroenabled.12",
-                                  "application/vnd.ms-powerpoint.presentation.macroenabled.12", "application/vnd.ms-powerpoint.slideshow.macroenabled.12",
-                                  "application/vnd.ms-powerpoint.template.macroenabled.12", "application/msword", "application/vnd.ms-word.document.macroenabled.12",
-                                  "application/vnd.ms-word.template.macroenabled.12", "application/x-rar-compressed", "application/x-tar", "application/zip", "application/x-dosexec",
-                                  "application/x-ms-installer", "application/x-elf", "application/x-sh", "text/x-perl", "text/x-python"]
+        self.target_mime_types = ["application/x-7z-compressed", "application/x-ace-compressed",
+                                  "application/x-shockwave-flash",
+                                  "application/pdf", "application/vnd.android.package-archive",
+                                  "application/octet-stream",
+                                  "application/x-bzip", "application/x-bzip2", "application/x-debian-package",
+                                  "application/java-archive",
+                                  "	application/javascript", "application/x-msdownload",
+                                  "application/x-ms-application", "application/vnd.ms-excel",
+                                  "application/vnd.ms-excel.addin.macroenabled.12",
+                                  "application/vnd.ms-excel.sheet.binary.macroenabled.12",
+                                  "application/vnd.ms-excel.template.macroenabled.12",
+                                  "application/vnd.ms-excel.sheet.macroenabled.12",
+                                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                  "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+                                  "application/vnd.ms-powerpoint.slide.macroenabled.12",
+                                  "application/vnd.ms-powerpoint.presentation.macroenabled.12",
+                                  "application/vnd.ms-powerpoint.slideshow.macroenabled.12",
+                                  "application/vnd.ms-powerpoint.template.macroenabled.12", "application/msword",
+                                  "application/vnd.ms-word.document.macroenabled.12",
+                                  "application/vnd.ms-word.template.macroenabled.12", "application/x-rar-compressed",
+                                  "application/x-tar", "application/zip", "application/x-dosexec",
+                                  "application/x-ms-installer", "application/x-elf", "application/x-sh", "text/x-perl",
+                                  "text/x-python"]
         self.tld_whitelist = ['local', 'test', 'localhost', 'example', 'invalid', 'arpa']
         # Malicious TLDs
         # https://www.tripwire.com/state-of-security/security-data-protection/cyber-security/most-suspicious-tlds-revealed-by-blue-coat-systems/
@@ -222,4 +251,3 @@ class File:
         self.vt_flag = False
         self.vt_positives = 0
         self.vt_report = None
-
