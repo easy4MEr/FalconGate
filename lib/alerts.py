@@ -23,16 +23,17 @@ class DailyAlerts(threading.Thread):
 
     def get_pwnage(self):
         pwnings = {}
-        for a in homenet.email_watchlist:
-            try:
-                r = requests.get(homenet.hibp_api_url + a, headers=self.headers)
-                if r.status_code == 200:
-                    r_json = r.json()
-                    if len(r_json) >= 1:
-                        pwnings[a] = r_json
-            except Exception as e:
-                log.debug('FG-ERROR: ' + e.__doc__ + " - " + e.message)
-            time.sleep(1)
+        if len(homenet.email_watchlist) > 0:
+            for a in homenet.email_watchlist:
+                try:
+                    r = requests.get(homenet.hibp_api_url + a, headers=self.headers)
+                    if r.status_code == 200:
+                        r_json = r.json()
+                        if len(r_json) >= 1:
+                            pwnings[a] = r_json
+                except Exception as e:
+                    log.debug('FG-ERROR: ' + e.__doc__ + " - " + e.message)
+                time.sleep(1)
 
         if len(pwnings) > 0:
             for a in pwnings.keys():
@@ -112,17 +113,22 @@ class MinuteAlerts(threading.Thread):
                 with lock:
                     for k in homenet.hosts.keys():
                         if homenet.hosts[k].mac != homenet.mac:
+                            # Checking for new DNS requests to malicious domains
                             for k1 in homenet.hosts[k].dns.keys():
                                 if homenet.hosts[k].dns[k1].bad:
                                     self.create_bad_domain_alert(k, k1)
+                                    del homenet.hosts[k].dns[k1]
+                            # Checking for new malicious file hashes
                             for k1 in homenet.hosts[k].files.keys():
                                 if homenet.hosts[k].files[k1].vt_positives > 2:
                                     self.create_bad_file_alert(k, k1)
-
+                                    del homenet.hosts[k].files[k1]
+                            # Checking for new connections to malicious IP addresses
                             for k1 in homenet.hosts[k].conns.keys():
                                 for threat in homenet.bad_ips.keys():
                                     if homenet.hosts[k].conns[k1].dst_ip in homenet.bad_ips[threat]:
                                         self.create_bad_ip_alert(threat, k, k1)
+                                        del homenet.hosts[k].conns[k1]
             except Exception as e:
                 log.debug('FG-ERROR:' + e.__doc__ + " - " + e.message)
             time.sleep(60)

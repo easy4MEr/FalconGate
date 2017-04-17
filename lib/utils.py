@@ -177,14 +177,20 @@ def get_latest_alerts(nalerts):
     return res
 
 
-def get_alerts_within_time(tframe):
+def get_alerts_within_time(tframe, handled):
     con = lite.connect('logs/alerts.sqlite')
     ctime = int(time.time())
     ttime = ctime - tframe
     with con:
         cur = con.cursor()
+        if handled == "all":
+            query = cur.execute("select * from alerts where fseen > ? order by fseen desc", (str(ttime),))
+        else:
+            query = cur.execute("select * from alerts where fseen > ? and handled = ? order by fseen desc", (str(ttime), handled))
+
         try:
-            cur.execute("select * from alerts where fseen > ? order by fseen desc", (str(ttime),))
+            #cur.execute("select * from alerts where fseen > ? order by fseen desc", (str(ttime), handled))
+            query
             res = cur.fetchall()
         except lite.OperationalError:
             res = ['none']
@@ -350,3 +356,24 @@ def get_syslogs(log_count):
             else:
                 break
     return json.dumps(logs_to_return)
+
+
+def reconfigure_network(old_gw, new_gw):
+    target_files = ['/etc/network/interfaces', '/etc/dnsmasq.conf', '/etc/nginx/sites-available/default']
+    octects = str(old_gw).split(".")
+    t_old_gw = '.'.join(octects[0:3])
+    octects = str(new_gw).split(".")
+    t_new_gw = '.'.join(octects[0:3])
+    for f in target_files:
+        for line in fileinput.input(f, inplace=1):
+            line = re.sub(old_gw, new_gw, line.rstrip())
+            line = re.sub(t_old_gw, t_new_gw, line.rstrip())
+            print(line)
+
+def update_alert_handled(alert_id, handled):
+    con = lite.connect('logs/alerts.sqlite')
+    with con:
+        cur = con.cursor()
+        cur.execute("update alerts set handled = ? where id = ?", (handled, alert_id))
+    con.commit()
+    con.close()
